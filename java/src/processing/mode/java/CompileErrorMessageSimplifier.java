@@ -199,8 +199,7 @@ public class CompileErrorMessageSimplifier {
       case IProblem.UndefinedMethod:
         if (args.length > 2) {
           String methodName = args[args.length - 2];
-          String methodArgs = removePackagePrefixes(args[args.length - 1]);
-          result = Language.interpolate("editor.status.undefined_method", methodName, methodArgs);
+          result = "Method '" + methodName + "()' was not found.";
         }
         break;
 
@@ -220,7 +219,7 @@ public class CompileErrorMessageSimplifier {
 
       case IProblem.UndefinedField:
         if (args.length > 0) {
-          result = Language.interpolate("editor.status.undef_global_var", args[0]);
+          result = "Variable '" + args[0] + "' is not defined.";
         }
         break;
 
@@ -251,7 +250,7 @@ public class CompileErrorMessageSimplifier {
 
       case IProblem.TypeMismatch:
         if (args.length > 1) {
-          result = Language.interpolate("editor.status.type_mismatch", args[0], args[1]);
+          result = "Cannot assign " + args[0] + " to " + args[1] + ".";
         }
         break;
 
