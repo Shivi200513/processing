@@ -15,6 +15,7 @@ sourceSets{
     main{
         java{
             srcDirs("src")
+            exclude("**/*.jnilib")
         }
         resources{
             srcDirs("src")
@@ -75,5 +76,8 @@ tasks.withType<Jar> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.compileJava{
+    options.encoding = "UTF-8"
+}
+tasks.javadoc{
     options.encoding = "UTF-8"
 }

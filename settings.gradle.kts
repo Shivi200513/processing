@@ -1,4 +1,9 @@
 rootProject.name = "processing"
+
+pluginManagement {
+    includeBuild("gradle/plugins")
+}
+
 include(
     "core",
     "core:examples",
@@ -6,6 +11,7 @@ include(
     "app:utils",
     "java",
     "java:preprocessor",
+    "java:gradle",
     "java:libraries:dxf",
     "java:libraries:io",
     "java:libraries:net",
