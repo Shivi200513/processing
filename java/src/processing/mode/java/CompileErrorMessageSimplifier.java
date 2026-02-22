@@ -199,6 +199,7 @@ public class CompileErrorMessageSimplifier {
       case IProblem.UndefinedMethod:
         if (args.length > 2) {
           String methodName = args[args.length - 2];
+          // Error message displayed when a mthod with the specified name does not exist. 
           result = "Method '" + methodName + "()' was not found.";
         }
         break;
@@ -219,6 +220,7 @@ public class CompileErrorMessageSimplifier {
 
       case IProblem.UndefinedField:
         if (args.length > 0) {
+          // Error message displayed when a referenced variable is undefined. 
           result = "Variable '" + args[0] + "' is not defined.";
         }
         break;
@@ -250,6 +252,7 @@ public class CompileErrorMessageSimplifier {
 
       case IProblem.TypeMismatch:
         if (args.length > 1) {
+          // Error message displayed when attempting to assign incompatible types.
           result = "Cannot assign " + args[0] + " to " + args[1] + ".";
         }
         break;
