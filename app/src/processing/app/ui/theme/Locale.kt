@@ -26,14 +26,25 @@ class Locale(language: String = "", val setLocale: ((java.util.Locale) -> Unit)?
     var locale: java.util.Locale = java.util.Locale.getDefault()
 
     fun loadResource(resourcePath: String) {
+
+        // Attempt to retrieve the resource as an input stream
         val stream = ClassLoader.getSystemResourceAsStream(resourcePath) ?: return
+
+        // Load the resource content using UTF-8 encoding
         load(stream.reader(Charsets.UTF_8))
     }
 
     init {
+        // Load default language properties 
         loadResource("languages/PDE.properties")
+
+        // Load language-specific properties 
         loadResource("languages/PDE_${locale.language}.properties")
+
+        // Load more specific locale variant 
         loadResource("languages/PDE_${locale.toLanguageTag()}.properties")
+
+        // If a custom language override is provided, attempt to load it
         if (language.isNotEmpty()) {
             loadResource("languages/PDE_${language}.properties")
         }
@@ -62,6 +73,9 @@ class Locale(language: String = "", val setLocale: ((java.util.Locale) -> Unit)?
  * ```
  */
 val LocalLocale = compositionLocalOf<Locale> { error("No Locale Set") }
+
+// Tracks the last time the locale was updated.
+// Updating this value forces recomposition of dependent UI.
 var LastLocaleUpdate by mutableStateOf(0L)
 
 /**
@@ -102,6 +116,9 @@ fun LocaleProvider(content: @Composable () -> Unit) {
     }
 
     val update = watchFile(languageFile)
+
+    // Extracts the language code (first two characters) from the language file.
+    // Recomputed whenever languageFile, update, or LastLocaleUpdate changes.
     var code by remember(languageFile, update, LastLocaleUpdate) {
         mutableStateOf(
             languageFile.readText().substring(0, 2)
@@ -116,6 +133,7 @@ fun LocaleProvider(content: @Composable () -> Unit) {
         Messages.log("Setting locale to ${locale.language}")
         languageFile.writeText(locale.language)
         code = locale.language
+        // Update timestamp to force recomposition and refresh localized content
         LastLocaleUpdate = System.currentTimeMillis()
     }
 

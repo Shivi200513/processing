@@ -99,6 +99,7 @@ class PDEPreferences {
             Interface.register()
             Coding.register()
             Sketches.register()
+            // Refactored call to match updated register() signature. 
             Other.register()
         }
 
@@ -111,6 +112,7 @@ class PDEPreferences {
             val locale = LocalLocale.current
             var preferencesQuery by remember { mutableStateOf("") }
 
+            // Registers and manages dynamic "Other" preference options within the given panes.
             Other.handleOtherPreferences(panes)
 
             /**
@@ -500,12 +502,16 @@ private fun CapturePreferences(content: @Composable () -> Unit) {
     }
 
     val apply = {
+        // Copy all current preference entries into the modified Properties object.
+        // Null values are safely converted to empty strings to avoid issues.
         prefs.entries.forEach { (key, value) ->
             modified.setProperty(key as String, (value ?: "") as String)
         }
     }
     val reset = {
         modified.entries.forEach { (key, value) ->
+            // Update the preference entry with the modified value.
+            // Falls back to an empty string if no updated value exists.
             prefs.setProperty(key as String, modified[key] ?: "")
         }
     }

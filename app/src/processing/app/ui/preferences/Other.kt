@@ -28,6 +28,7 @@ class Other {
             after = sketches
         )
 
+        // Updated function signature: removed PDEPreferencePanes parameter 
         fun register() {
             PDEPreferences.register(
                 PDEPreference(
@@ -47,11 +48,23 @@ class Other {
             )
         }
 
+/**
+ * Handles the registration and grouping of additional preference options.
+ *
+ * This composable checks whether the "show_other" preference is enabled.
+ * If enabled, it dynamically adds related preference options to the same
+ * preference group using a DisposableEffect tied to the provided panes.
+ *
+ * @param panes The collection of preference panes used to locate and
+ *              modify the appropriate preference group.
+*/
         @Composable
         fun handleOtherPreferences(panes: PDEPreferencePanes) {
             // This function can be used to handle any specific logic related to other preferences if needed
             val prefs = LocalPreferences.current
             val locale = LocalLocale.current
+
+            // Exit early if the "show_other" preference is disabled
             if (prefs["preferences.show_other"]?.toBoolean() != true) {
                 return
             }
@@ -60,16 +73,26 @@ class Other {
                 val group =
                     panes[other]?.find { group -> group.any { preference -> preference.key == "preferences.show_other" } } as? MutableList<PDEPreference>
 
+                // Collect all existing preference keys already registered in panes
+                // Flattening because panes → groups → preferences is a nested structure
                 val existing = panes.values.flatten().flatten().map { preference -> preference.key }
+
+                // Identify preference keys that are present in prefs but not yet registered
+                // Only include String keys and sort them for consistent ordering
                 val keys = prefs.keys.mapNotNull { it as? String }.filter { it !in existing }.sorted()
 
+                // Dynamically create and register missing preferences 
                 for (prefKey in keys) {
                     val descriptionKey = "preferences.$prefKey"
                     val preference = PDEPreference(
                         key = prefKey,
                         descriptionKey = if (locale.containsKey(descriptionKey)) descriptionKey else prefKey,
                         pane = other,
+                        // Dynamically choose UI control based on preference type
                         control = { preference, updatePreference ->
+
+                            // If the stored value can be parsed strictly as Boolean,
+                            // render a Switch control
                             if (preference?.toBooleanStrictOrNull() != null) {
                                 Switch(
                                     checked = preference.toBoolean(),
@@ -80,6 +103,7 @@ class Other {
                                 return@PDEPreference
                             }
 
+                            // Otherwise render a text input field for string values 
                             OutlinedTextField(
                                 modifier = Modifier.widthIn(max = 300.dp),
                                 value = preference ?: "",
@@ -89,8 +113,12 @@ class Other {
                             )
                         }
                     )
+                    // Add the dynamically created preferences to the identified group
                     group?.add(preference)
                 }
+
+                // When the composable leaves composition,
+                // remove dynamically added preferences while keeping the base toogle
                 onDispose {
                     group?.apply {
                         removeIf { it.key != "preferences.show_other" }
