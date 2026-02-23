@@ -23,18 +23,70 @@
 
 package processing.app.ui;
 
-import com.formdev.flatlaf.util.SystemInfo;
-import processing.app.*;
-import processing.app.Formatter;
-import processing.app.contrib.ContributionManager;
-import processing.app.laf.PdeMenuItemUI;
-import processing.app.syntax.*;
-import processing.core.PApplet;
-import processing.utils.SketchException;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.stream.Collectors;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.SizeRequirements;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.text.BadLocationException;
@@ -46,19 +98,31 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.*;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
-import java.util.Timer;
-import java.util.stream.Collectors;
+
+import com.formdev.flatlaf.util.SystemInfo;
+
+import processing.app.Base;
+import processing.app.Formatter;
+import processing.app.Language;
+import processing.app.Messages;
+import processing.app.Mode;
+import processing.app.Platform;
+import processing.app.Preferences;
+import processing.app.PreferencesEvents;
+import processing.app.Problem;
+import processing.app.RunnerListener;
+import processing.app.Sketch;
+import processing.app.SketchCode;
+import processing.app.UpdateCheck;
+import processing.app.contrib.ContributionManager;
+import processing.app.laf.PdeMenuItemUI;
+import processing.app.syntax.JEditTextArea;
+import processing.app.syntax.PdeInputHandler;
+import processing.app.syntax.PdeTextArea;
+import processing.app.syntax.PdeTextAreaDefaults;
+import processing.app.syntax.SyntaxDocument;
+import processing.core.PApplet;
+import processing.utils.SketchException;
 
 
 /**
@@ -371,6 +435,8 @@ public abstract class Editor extends JFrame implements RunnerListener {
       });
     }
 
+    // Registers updateTheme as a callback to be invoked
+    // whenever preference values are updated.
       PreferencesEvents.onUpdated(this::updateTheme);
   }
 
